@@ -1,0 +1,34 @@
+let $src1-phones :=  
+    fn:distinct-values(
+      cts:search( /,
+        cts:and-query(( 
+          cts:element-value-query(xs:QName("ind:src"), $src1),
+          cts:element-query(xs:QName("ind:telephoneNumber"),cts:true-query())
+        )),
+        'unfiltered'
+      )[$start to $end]//phy:telephoneNumber/fn:string() 
+    )
+
+  return 
+    fn:count(
+      for $phone in $src1-phones  
+      let $est :=
+        xdmp:estimate(
+          cts:search( /,
+            cts:and-query(( 
+              cts:element-value-query(xs:QName("ind:src"), $src2),
+              cts:element-value-query(xs:QName("----"), $phone)
+            )),
+            'unfiltered'
+          ) 
+        )
+      return 
+        if ($est > 0 ) then 
+         1 
+       else 
+         ()
+    )
+},
+<options xmlns="xdmp:eval">
+  <result>true</result>
+</options>
